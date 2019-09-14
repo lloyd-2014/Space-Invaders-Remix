@@ -37,8 +37,8 @@ void setup() {
     objects.add(new Tesla(1400, 0, 100));
     sackboy = new Sackboy(START_X, START_Y);
     toggle = new Toggle(START_X, START_Y);
-    orbiter = new Orbiter(width-200, height-650);
-    baseCamp = new BaseCamp(100, height-300);
+    orbiter = new Orbiter(width-200, height-650, 100, 600);
+    baseCamp = new BaseCamp(100, height-300, 400, 300, color(169, 229, 236));
     astronauts.add(sackboy);
     PFont font = loadFont("Consolas-48.vlw");
     textFont(font, 32);
@@ -74,20 +74,22 @@ void draw() {
             sack.display();
             sack.checkWallCollision();
             hp = sack.getHP();
-            if (orbiter.collisionDetected(sack)) {
+            if (orbiter.sackIsInside(sack)) {
+                orbiter.addPassenger(sack);
                 message = "You enter the orbiter";
-                // println("You enter the orbiter");
                 astronauts.remove(sack);
                 if (sack instanceof Sackboy) {
                     astronauts.add(toggle);
                 }
             } 
-            if (baseCamp.collisionDetected(sack)) {
-                sack.inBaseCamp(true);
+            if (baseCamp.sackIsInside(sack)) {
+                //sack.inBaseCamp(true);
+                baseCamp.setColour(color(74, 201, 78));
                 message = "You cannot be hurt in the base camp.";
                 // println("You cannot be hurt in the base camp.");
             } else {
                 sack.inBaseCamp(false);
+                baseCamp.setColour(color(169, 229, 236));
             }
             for (int i=0; i<segments; i++) {
                 sack.checkGroundCollision(ground[i]);
