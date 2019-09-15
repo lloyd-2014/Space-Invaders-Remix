@@ -10,6 +10,9 @@ public abstract class Sack extends MovingObject {
     private float rightArmAngle;
     private float leftArmAngle;
     private ArrayList<Specimen> specimens = new ArrayList<Specimen>();
+    private int greenSpecimenCount = 0;
+    private int blueSpecimenCount = 0;
+    private int redSpecimenCount = 0;
     private boolean isAlive;
     private boolean isSafe;
     private JetPack jetPack;
@@ -64,7 +67,18 @@ public abstract class Sack extends MovingObject {
 
     public void collectSpecimen(Specimen s) {
         specimens.add(s);
+        incrementSpecimenTypeCount(s);
     } 
+    
+    private void incrementSpecimenTypeCount(Specimen s) {
+        if (s.type == "green") ++greenSpecimenCount;
+        if (s.type == "blue") ++blueSpecimenCount;
+        if (s.type == "red") ++redSpecimenCount;
+    }
+    
+    public int getGreenSpecimenCount() { return greenSpecimenCount; }
+    public int getBlueSpecimenCount() { return blueSpecimenCount; }
+    public int getRedSpecimenCount() { return redSpecimenCount; }
     
     public ArrayList<Specimen> mySpecimens() {
         return specimens;

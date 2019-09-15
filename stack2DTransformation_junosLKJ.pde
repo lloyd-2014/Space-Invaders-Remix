@@ -97,7 +97,6 @@ void draw() {
             }
             // display aliens, specimens, and Tesla
             for (int i = 0; i < objects.size(); i++) {
-                Specimen temp;
                 objects.get(i).move();
                 objects.get(i).display();
                 objects.get(i).checkWallCollision();
@@ -147,7 +146,7 @@ void draw() {
     vertex(ground[segments-1].x2, height);
     vertex(ground[0].x1, height);
     endShape(CLOSE);
-    if (astronauts.size() == 0) gameOver();
+    if (allAstronautsAreDead()) gameOver();
 }   
 
 void keyPressed(Sack sack) {
@@ -180,127 +179,62 @@ void keyPressed(Sack sack) {
 
 void gameOver() {
     textSize(100);
-    iterateGraveyard();
-    if (astronauts.size() == 0 && (!toggleIsDead || !sackboyIsDead)) {
-        iterateOrbiter();
-        textSize(50);
-        fill(127);        
-        text("You survived the Alien horde.", width/3, height/2);    
-        displayStatistics();
+      
+    if (atLeastOneAstronautDiedAndSurvived()) {
+        displayScore(orbiter.getPassengers());
+        displayScore(graveyard);
+        displayEndOfGameMessage("You survived the horde but not all made it.");
+    }
+    else if (allAstronautsSurvived()) {
+        displayScore(orbiter.getPassengers());
+        displayEndOfGameMessage("Congratulations, everyone survived.");
+    }
+    else {
+        displayScore(graveyard);
+        displayEndOfGameMessage("Game Over. All astronauts died.");
+    }
+    
+    displayStatistics();
+}
+
+void displayEndOfGameMessage(String message) {
+    textSize(50);
+    fill(127);        
+    text(message, width/3, height/2);
+}
+
+boolean atLeastOneAstronautDiedAndSurvived() {
+    return graveyard.size() > 0 && graveyard.size() < 2;
+}
+
+boolean allAstronautsSurvived() {
+    return orbiter.getPassengers().size() == 2;
+}
+
+boolean allAstronautsAreDead() {
+    return astronauts.size() == 0;
+}
+
+void displayScore(ArrayList<Sack> sacks) {
+    for (Sack sack : sacks) {
+        if (sack instanceof Sackboy) displaySackSpecimenCounts(sack, width/3, 24);
+        if (sack instanceof Toggle) displaySackSpecimenCounts(sack, width/3+300, 24);
     }
 }
 
-void iterateGraveyard() {
-    int sackboyGreen = 0; 
-    int sackboyBlue = 0; 
-    int sackboyRed = 0;
-    int toggleGreen = 0; 
-    int toggleBlue = 0; 
-    int toggleRed = 0;
-    if (graveyard.size() == 2) {
-        fill(127);        
-        text("GAME OVER", width/3, height/2);
-        noFill();
-    }
-    if (graveyard.size() > 0) {
-        displayStatistics();
-        for (Sack sack : graveyard) {
-            textSize(24);
-            ArrayList<Specimen> specs = sack.mySpecimens();
-            for (Specimen s : specs) {
-                if (sack instanceof Sackboy) {
-                    if (s.getType() == "green") sackboyGreen++;
-                    if (s.getType() == "blue") sackboyBlue++;
-                    if (s.getType() == "red") sackboyRed++;
-                } 
-                else if (sack instanceof Toggle) {
-                    if (s.getType() == "green") toggleGreen++;
-                    if (s.getType() == "blue") toggleBlue++;
-                    if (s.getType() == "red") toggleRed++;
-                }
-            }
-            if (sack instanceof Sackboy) {
-                text(sack.getName()+"\n", width/3, height/4);
-                fill(255, 0, 0);
-                text("Red: "+sackboyRed+"\n", width/3, height/4+30);
-                noFill();
-                fill(0,0,255);
-                text("Blue: "+sackboyBlue+"\n", width/3, height/4+60);
-                noFill();
-                fill(0,255,0);
-                text("Green: "+sackboyGreen+"\n", width/3, height/4+90);                
-                noFill();
-            } 
-            if (sack instanceof Toggle) {
-                fill(255);
-                text(sack.getName()+"\n", width/3+300, height/4);
-                noFill();
-                fill(255,0,0);
-                text("Red: "+toggleRed+"\n", width/3+300, height/4+30);
-                noFill();
-                fill(0,0,255);
-                text("Blue: "+toggleBlue+"\n", width/3+300, height/4+60);
-                noFill();
-                fill(0,255,0);
-                text("Green: "+toggleGreen+"\n", width/3+300, height/4+90); 
-                noFill();
-            }
-        }
-    } 
+void displaySackSpecimenCounts(Sack sack, int textWidth, int fontSize) {
+    textSize(fontSize);
+    text(sack.getName()+"\n", textWidth, height/4);
+    fill(255, 0, 0);
+    text("Red: "+sack.getRedSpecimenCount()+"\n", textWidth, height/4+30);
+    noFill();
+    fill(0,0,255);
+    text("Blue: "+sack.getBlueSpecimenCount()+"\n", textWidth, height/4+60);
+    noFill();
+    fill(0,255,0);
+    text("Green: "+sack.getGreenSpecimenCount()+"\n", textWidth, height/4+90);                
+    noFill();
 }
-
-void iterateOrbiter() {
-    int sackboyGreen = 0; 
-    int sackboyBlue = 0; 
-    int sackboyRed = 0;
-    int toggleGreen = 0; 
-    int toggleBlue = 0; 
-    int toggleRed = 0;
-    ArrayList<Sack> ship = orbiter.getPassengers();
-    for (Sack sack : ship) {
-        ArrayList<Specimen> specs = sack.mySpecimens();
-        for (Specimen s : specs) {
-            if (sack instanceof Sackboy) {
-                if (s.getType() == "green") sackboyGreen++;
-                if (s.getType() == "blue") sackboyBlue++;
-                if (s.getType() == "red") sackboyRed++;
-            } 
-            else if (sack instanceof Toggle) {
-                if (s.getType() == "green") toggleGreen++;
-                if (s.getType() == "blue") toggleBlue++;
-                if (s.getType() == "red") toggleRed++;
-            }
-        }
-        textSize(24);
-        if (sack instanceof Sackboy) {
-            text(sack.getName()+"\n", width/3, height/4);
-            fill(255, 0, 0);
-            text("Red: "+sackboyRed+"\n", width/3, height/4+30);
-            noFill();
-            fill(0,0,255);
-            text("Blue: "+sackboyBlue+"\n", width/3, height/4+60);
-            noFill();
-            fill(0,255,0);
-            text("Green: "+sackboyGreen+"\n", width/3, height/4+90);                
-            noFill();
-        } 
-        if (sack instanceof Toggle) {
-            fill(255);
-            text(sack.getName()+"\n", width/3+300, height/4);
-            noFill();
-            fill(255,0,0);
-            text("Red: "+toggleRed+"\n", width/3+300, height/4+30);
-            noFill();
-            fill(0,0,255);
-            text("Blue: "+toggleBlue+"\n", width/3+300, height/4+60);
-            noFill();
-            fill(0,255,0);
-            text("Green: "+toggleGreen+"\n", width/3+300, height/4+90); 
-            noFill();
-        }
-    }
-}
-
 
 // https://forum.processing.org/one/topic/how-to-perform-an-action-every-x-seconds-time-delays.html
 void spawnAlien() {
