@@ -1,3 +1,17 @@
+class MenuButton {
+    int position;
+    float translate_y; 
+    String text; 
+    color highlight;
+    
+    public MenuButton(int position, float translate_y, String text, color highlight) {
+        this.position = position;
+        this.translate_y = translate_y;
+        this.text = text;
+        this.highlight = highlight;
+    }
+}
+
 public class Menu {
 
     private String start = "single player";
@@ -20,7 +34,6 @@ public class Menu {
     private boolean startGame = false;
     private boolean settingsClicked = false;
     private boolean displayMenu = true;
-    private boolean backClicked = false;
     private HScrollbar hs1;
     private int time = 3000;
     
@@ -74,8 +87,8 @@ public class Menu {
         displayWindow();
         if (displayMenu) {
             displayStart();
-            highscoreText();
-            settingsText();
+            sceneText(new MenuButton(highscorePosition, windowY/2+textsize+90, highscores, highlight2));
+            sceneText(new MenuButton(settingsPosition, windowY/2+textsize+180, settings, highlight3));
         }
         if (settingsClicked) {
             displaySettings();
@@ -92,31 +105,17 @@ public class Menu {
         text(start, windowX/1.5, windowY/2+90);
         noFill();
     }
-
-    private void highscoreText() {
+    
+    private void sceneText(MenuButton button) {
         textSize(textsize);
-        fill(highlight2, 150);
-        // rectMode(CENTER);
-        rect(windowX/2, highscorePosition, windowX, textsize);
+        fill(button.highlight, 150);
+        rect(windowX/2, button.position, windowX, textsize);
         noFill();     
         pushMatrix();
-        translate(windowX/1.5, windowY/2+textsize+90);
+        //translate(windowX/1.5, windowY/2+textsize+90);
+        translate(windowX/1.5, button.translate_y);
         fill(255, 255, 255, 150);      
-        text(highscores, 0, 0);
-        popMatrix();
-        noFill();
-    }
-
-    private void settingsText() {
-        textSize(textsize);
-        fill(highlight3, 150);
-        // rectMode(CENTER);
-        rect(windowX/2, settingsPosition, windowX, textsize);
-        noFill();    
-        fill(255, 255, 255, 150);      
-        pushMatrix();
-        translate(windowX/1.5, windowY/2+textsize+180);
-        text(settings, 0, 0);
+        text(button.text, 0, 0);
         popMatrix();
         noFill();
     }
